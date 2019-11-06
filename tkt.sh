@@ -26,11 +26,11 @@ usage() {
 	echo "  -o, --opened              display number of open tickets and exit"
 	echo "  -c, --closed              display number of closed tickets and exit"
 	echo "  -p, --print-open[=n]      print the n oldest open tickets and exit"
-	echo "                                Defaults to 10"
+	echo "                                    Defaults to 10"
 	echo "  -u, --update=TICKET_NUM   update a ticket instead of creating a new one."
-	echo "                                This will allow you to change the name,"
-	echo "                                severity, or append a description."
-	echo "                                If the ticket is closed, it will be reopened"
+	echo "                                    This will allow you to change the name,"
+	echo "                                    severity, or append a description."
+	echo "                                    If the ticket is closed, it will be reopened"
 	echo "  -n, --name=NAME           create a ticket titled NAME"
 	echo "  -s, --sev=SEV-LEVEL       create a ticket with SEV-LEVEL"
 	echo "  -d, --desc=DESC           create a ticket with DESC"
@@ -167,7 +167,7 @@ while true; do
 done
 
 
-if [ $update ]; then
+if [ "$update" = true ]; then
 	# We're updating a ticket. Handled differently
 	if [ ! -f "$TKTDIR/open/$tnum" ]; then
 		if [ ! -f "$TKTDIR/closed/$tnum" ]; then
@@ -195,7 +195,7 @@ else
 		echo -e "${RED}A ticket must have a name${NC}"
 		echo ""
 		usage
-		exit
+		exit 1
 	fi
 	filename="$TKTDIR/open/$tnum"
 	touch "$filename"
