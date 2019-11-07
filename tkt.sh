@@ -10,6 +10,13 @@ NC='\033[0m'
 # default args
 TKTDIR="/tickets"
 
+# make sure the ticketing directories exist
+if [ ! -d "$TKTDIR" ]; then
+	mkdir "$TKTDIR"
+	mkdir "$TKTDIR/open"
+	mkdir "$TKTDIR/closed"
+fi
+
 update=false
 num_print=10
 name=""
