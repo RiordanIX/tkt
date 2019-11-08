@@ -12,8 +12,7 @@ TKTDIR="/tickets"
 
 # make sure the ticketing directories exist
 if [ ! -d "$TKTDIR" ]; then
-	mkdir -p "$TKTDIR/open"
-	mkdir -p "$TKTDIR/closed"
+	mkdir -p "$TKTDIR/open/../closed"
 fi
 
 update=false
