@@ -8,7 +8,7 @@ GREEN='\033[0;32m'
 NC='\033[0m'
 
 # default args
-TKTDIR="/tickets"
+TKTDIR="$HOME/.tickets"
 
 # make sure the ticketing directories exist
 if [ ! -d "$TKTDIR" ]; then
@@ -67,7 +67,7 @@ print_open() {
 	do
 		printf "${RED}$fl\n"
 		printf '%.s-' {1..70}
-		printf "\n${NC}"
+		printf "${NC}\n"
 		while IFS= read -r line; do 
 			echo -e "\t$line"
 		done < "$TKTDIR/open/$fl"
@@ -151,7 +151,7 @@ while true; do
 			;;
 		-u|--update)
 			update=true
-			tnum="$2"
+			tnum="$2.tkt"
 			shift 2
 			;;
 		\?*)
@@ -174,27 +174,25 @@ done
 
 if [ "$update" = true ]; then
 	# We're updating a ticket. Handled differently
-	if [ ! -f "$TKTDIR/open/$tnum" ]; then
-		if [ ! -f "$TKTDIR/closed/$tnum" ]; then
+	if [ ! -f "$TKTDIR/open/$tnum.tkt" ]; then
+		if [ ! -f "$TKTDIR/closed/$tnum.tkt" ]; then
 			echo "Ticket '$tnum' does not exist" 
 			exit 1
 		else
 			# we assume since the user is updating a closed ticket, that they
 			# want to reopen the ticket.
-			mv "$TKTDIR/closed/$tnum" "$TKTDIR/open/$tnum"
+			mv "$TKTDIR/closed/$tnum" "$TKTDIR/open/$tnum.tkt"
 			echo -e "Ticket $tnum is ${GREEN}reopened${NC}"
 		fi
 	fi
 	# Handled the cases where it's closed or doesn't exist, carry on.
-	filename="$TKTDIR/open/$tnum"
+	filename="$TKTDIR/open/$tnum.tkt"
 	[ ! -z "$name" ] && sed -i "1s/.*/$name/" $filename
 	[ ! -z "$sev" ] && sed -i "2s/.*/$sev/" $filename
 	[ ! -z "$desc" ] && echo "$desc" >> "$filename"
 	echo "Ticket $tnum has been modified"
 else
 	# We're not updating a ticket, we're creating it.
-	opened=$(($(ls -l "$TKTDIR/open/" | wc -l) - 1))
-	tnum=$(($(ls -l "$TKTDIR/closed/" | wc -l) + opened))
 	if [ -z "$name" ]; then
 		# No name given, we must have a name
 		echo -e "${RED}A ticket must have a name${NC}"
@@ -202,7 +200,9 @@ else
 		usage
 		exit 1
 	fi
-	filename="$TKTDIR/open/$tnum"
+	opened=$(find "$TKTDIR/open/" -maxdepth 1 -name "*.tkt" | wc -l)
+	tnum=$(($(find "$TKTDIR/closed/" -maxdepth 1 -name "*.tkt" | wc -l) + opened))
+	filename="$TKTDIR/open/$tnum.tkt"
 	touch "$filename"
 
 	echo "$name" >> "$filename"
@@ -213,4 +213,3 @@ else
 
 	echo "Your ticket has been opened and is number $tnum"
 fi
-
